@@ -4,7 +4,9 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+
+// ✅ Render asigna su propio puerto dinámico
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
@@ -39,6 +41,11 @@ function leerVentas() {
   return ventas;
 }
 
+// 👋 Ruta raíz obligatoria para Render (salud del servicio)
+app.get("/", (req, res) => {
+  res.send("🚀 API de Ventas corriendo correctamente en Render");
+});
+
 // 📊 Endpoint principal con filtros y resumen opcional
 app.get("/api/ventas", (req, res) => {
   try {
@@ -64,7 +71,7 @@ app.get("/api/ventas", (req, res) => {
       resultado = resultado.filter(v => v.Fecha === fecha);
     }
 
-    // Si se pide resumen (por ?resumen=true)
+    // Si se pide resumen (?resumen=true)
     if (resumen === "true") {
       const totalUnidades = resultado.reduce((acc, cur) => acc + (cur.Cantidad || 0), 0);
       const totalVentas = resultado.reduce((acc, cur) => acc + (cur.Total || 0), 0);
@@ -125,5 +132,5 @@ app.get("/api/resumen", (req, res) => {
 
 // 🚀 Inicia el servidor
 app.listen(PORT, () => {
-  console.log(`✅ API corriendo en http://localhost:${PORT}/api/ventas`);
+  console.log(`✅ API corriendo en el puerto ${PORT}`);
 });
