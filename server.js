@@ -102,32 +102,20 @@ app.get("/api/ventas", (req, res) => {
 });
 
 // 📈 Endpoint separado solo para resumen global
-// 📈 Endpoint separado solo para resumen global
 app.get("/api/resumen", (req, res) => {
   try {
     const ventas = leerVentas();
 
-    // 🧮 Agrupar por platillo y sumar cantidad o total de ventas si la cantidad es 0
-    const agrupado = {};
-
-    ventas.forEach(v => {
-      const nombre = v.Platillo?.trim();
-      if (!nombre) return;
-
-      // Si la cantidad es 0 o vacía, usar el total como base
-      const valor = v.Cantidad && v.Cantidad > 0 ? v.Cantidad : v.Total || 0;
-
-      agrupado[nombre] = (agrupado[nombre] || 0) + valor;
-    });
-
-    // 🏆 Ordenar por cantidad/total descendente
-    const top = Object.entries(agrupado).sort((a, b) => b[1] - a[1])[0];
-
-    // 📊 Calcular totales generales
     const totalUnidades = ventas.reduce((acc, cur) => acc + (cur.Cantidad || 0), 0);
     const totalVentas = ventas.reduce((acc, cur) => acc + (cur.Total || 0), 0);
 
-    // 🧾 Crear resumen
+    const agrupado = {};
+    ventas.forEach(v => {
+      agrupado[v.Platillo] = (agrupado[v.Platillo] || 0) + v.Cantidad;
+    });
+
+    const top = Object.entries(agrupado).sort((a, b) => b[1] - a[1])[0];
+
     const resumen = {
       total_unidades: totalUnidades,
       total_ventas: totalVentas.toFixed(2),
